@@ -12,18 +12,21 @@ func TestService_Reject_PaymentStatusFail(t *testing.T) {
 	payments := []*types.Payment{
 		{
 			"1",
+			1,
 			1000,
 			"mobile",
 			types.PaymentStatusInProgress,
 		},
 		{
 			"2",
+			1,
 			2000,
 			"device",
 			types.PaymentStatusInProgress,
 		},
 		{
 			"3",
+			1,
 			3000,
 			"transport",
 			types.PaymentStatusFail,
@@ -41,18 +44,21 @@ func TestService_Reject_PaymentStatusFound(t *testing.T) {
 	payments := []*types.Payment{
 		{
 			"1",
+			1,
 			1000,
 			"mobile",
 			types.PaymentStatusInProgress,
 		},
 		{
 			"2",
+			1,
 			2000,
 			"device",
 			types.PaymentStatusInProgress,
 		},
 		{
 			"3",
+			1,
 			3000,
 			"transport",
 			types.PaymentStatusFail,

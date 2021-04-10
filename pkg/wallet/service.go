@@ -4,8 +4,10 @@ import (
 	"errors"
 
 	"github.com/amirbek-jan/wallet/pkg/types"
+	"github.com/google/uuid"
 )
 
+var ErrNotEnoughBalance = errors.New("not enough balance")
 var ErrPhoneRegistered = errors.New("phone already registered")
 var ErrAmountMustBePositive = errors.New("amount must be greater than zero")
 var ErrPaymentNotFound = errors.New("payment not found")
@@ -90,4 +92,37 @@ func (s *Service) Deposit(accountID int64, amount types.Money) error {
 
 	account.Balance += amount
 	return nil
+}
+
+func (s *Service) Pay(accountID int64, amount types.Money, category types.PaymentCategory) (*types.Payment, error){
+	if amount <= 0{
+		return nil, ErrAmountMustBePositive
+	}
+
+	var account *types.Account
+	for _, acc := range s.accounts {
+		if acc.ID == accountID {
+			account = acc
+			break
+		}
+	}
+	if account == nil {
+		return nil, ErrAccountNotFound
+	}
+
+	if account.Balance < amount {
+		return nil, ErrNotEnoughBalance
+	}
+
+	account.Balance -= amount
+	paymentID := uuid.New().String()
+	payment := &types.Payment{
+		ID: paymentID,
+		AccountID:	accountID,
+		Amount: amount,
+		Category: category,
+		Status:	types.PaymentStatusInProgress,
+	}
+	s.payments = append(s.payments, payment)
+	return payment, nil
 }
