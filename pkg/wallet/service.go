@@ -3,12 +3,12 @@ package wallet
 import (
 	"errors"
 
-	"github.com/amirbek-jan/wallet/pkg/types")
-
+	"github.com/amirbek-jan/wallet/pkg/types"
+)
 
 var ErrPhoneRegistered = errors.New("phone already registered")
 var ErrAmountMustBePositive = errors.New("amount must be greater than zero")
-var ErrAccountNotFound = errors.New("account not found")
+var ErrPaymentNotFound = errors.New("account not found")
 
 type Service struct {
 	nextAccountID int64
@@ -21,13 +21,24 @@ type Error string
 func (e Error) Error() string {
 	return string(e)
 }
-func (s *Service) FindAccountByID(accountID int64) (*types.Account, error) {
-	for _, account := range s.accounts {
-		if account.ID == accountID {
-			return account, nil
+
+func (s *Service) Reject(paymentID string) error{
+	for _, payment := range s.payments {
+		if payment.ID == paymentID {
+			payment.Status = types.PaymentStatusFail
+		}
+		return ErrPaymentNotFound
+	}
+	return nil
+}
+
+func (s *Service) FindPaymentByID(paymentID string) (*types.Payment, error) {
+	for _, payment := range s.payments {
+		if payment.ID == paymentID {
+			return payment, nil
 		}
 	}
-	return nil, ErrAccountNotFound
+	return nil, ErrPaymentNotFound
 }
 
 func (s *Service) RegisterAccount(phone types.Phone) (*types.Account, error) {
@@ -39,8 +50,8 @@ func (s *Service) RegisterAccount(phone types.Phone) (*types.Account, error) {
 
 	s.nextAccountID++
 	account := &types.Account{
-		ID: s.nextAccountID,
-		Phone: phone,
+		ID:      s.nextAccountID,
+		Phone:   phone,
 		Balance: 0,
 	}
 	s.accounts = append(s.accounts, account)
@@ -62,7 +73,7 @@ func (s *Service) Deposit(accountID int64, amount types.Money) error {
 	}
 
 	if account == nil {
-		return ErrAccountNotFound
+		return ErrPaymentNotFound
 	}
 
 	account.Balance += amount

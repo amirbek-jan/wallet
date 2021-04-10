@@ -18,7 +18,7 @@ func main(){
 		switch err {
 		case wallet.ErrAmountMustBePositive:
 			fmt.Println("Сумма должна быть положительной")
-		case wallet.ErrAccountNotFound:
+		case wallet.ErrPaymentNotFound:
 			fmt.Println("Аккаунт пользователя не найден")
 		}
 		return
