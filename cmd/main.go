@@ -1,9 +1,15 @@
 package main
 
-import "github.com/amirbek-jan/wallet/pkg/wallet"
+import (
+	"fmt"
+	"github.com/amirbek-jan/wallet/pkg/wallet"
+)
 
 func main(){
 	svc := &wallet.Service{}
-
-	svc.RegisterAccount("+992000000001")
+	account, err := svc.RegisterAccount("+992000000001")
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
 }
