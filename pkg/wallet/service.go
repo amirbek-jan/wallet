@@ -38,7 +38,7 @@ func (s *Service) FindPaymentByID(paymentID string) (*types.Payment, error) {
 	for _, payment := range s.payments {
 		if payment.ID == paymentID {
 			return payment, nil
-		}
+		} 
 	}
 	return nil, ErrPaymentNotFound
 }
