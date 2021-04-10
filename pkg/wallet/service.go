@@ -8,7 +8,8 @@ import (
 
 var ErrPhoneRegistered = errors.New("phone already registered")
 var ErrAmountMustBePositive = errors.New("amount must be greater than zero")
-var ErrPaymentNotFound = errors.New("account not found")
+var ErrPaymentNotFound = errors.New("payment not found")
+var ErrAccountNotFound = errors.New("account not found")
 
 type Service struct {
 	nextAccountID int64
@@ -22,7 +23,7 @@ func (e Error) Error() string {
 	return string(e)
 }
 
-func (s *Service) Reject(paymentID string) error{
+func (s *Service) Reject(paymentID string) error {
 	for _, payment := range s.payments {
 		if payment.ID == paymentID {
 			payment.Status = types.PaymentStatusFail
@@ -31,7 +32,6 @@ func (s *Service) Reject(paymentID string) error{
 	}
 	return nil
 }
-
 
 // Find Payment by ID
 func (s *Service) FindPaymentByID(paymentID string) (*types.Payment, error) {
@@ -50,7 +50,7 @@ func (s *Service) FindAccountByID(accountID int64) (*types.Account, error) {
 			return account, nil
 		}
 	}
-	return nil, ErrPaymentNotFound
+	return nil, ErrAccountNotFound
 }
 
 func (s *Service) RegisterAccount(phone types.Phone) (*types.Account, error) {
