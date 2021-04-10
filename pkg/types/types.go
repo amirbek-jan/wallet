@@ -26,5 +26,3 @@ type Account struct {
 	Phone   Phone
 	Balance Money
 }
-
-type Error string
