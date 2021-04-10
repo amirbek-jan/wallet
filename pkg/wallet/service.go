@@ -32,10 +32,22 @@ func (s *Service) Reject(paymentID string) error{
 	return nil
 }
 
+
+// Find Payment by ID
 func (s *Service) FindPaymentByID(paymentID string) (*types.Payment, error) {
 	for _, payment := range s.payments {
 		if payment.ID == paymentID {
 			return payment, nil
+		}
+	}
+	return nil, ErrPaymentNotFound
+}
+
+// Find Account by ID
+func (s *Service) FindAccountByID(accountID int64) (*types.Account, error) {
+	for _, account := range s.accounts {
+		if account.ID == accountID {
+			return account, nil
 		}
 	}
 	return nil, ErrPaymentNotFound

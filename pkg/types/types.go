@@ -1,5 +1,7 @@
 package types
 
+type UUID [16]byte
+
 type Money int64
 
 type PaymentCategory string
