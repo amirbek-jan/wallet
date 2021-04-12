@@ -36,7 +36,7 @@ var defaultTestAccount = testAccount{
 		amount   types.Money
 		category types.PaymentCategory
 	}{
-		{amount: 1_000_00, category: "aouto"},
+		{amount: 1_000_00, category: "auto"},
 	},
 }
 
