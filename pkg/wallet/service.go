@@ -20,30 +20,27 @@ type Service struct {
 	payments      []*types.Payment
 }
 
-type testService struct {
-	*Service
-}
 type testAccount struct {
-	phone types.Phone
-	balance	types.Money
-	payments []struct{
-		amount	types.Money
+	phone    types.Phone
+	balance  types.Money
+	payments []struct {
+		amount   types.Money
 		category types.PaymentCategory
 	}
 }
+
 var defaultTestAccount = testAccount{
-	phone: "+992000000001",
+	phone:   "+992000000001",
 	balance: 10_000_00,
 	payments: []struct {
-		amount types.Money
-		category	types.PaymentCategory
+		amount   types.Money
+		category types.PaymentCategory
 	}{
 		{amount: 1_000_00, category: "aouto"},
 	},
 }
 
-func (s *testService) addAccount(data testAccount) (*types.Account, []*types.Payment, error) {
-
+func (s *Service) addAccount(data testAccount) (*types.Account, []*types.Payment, error) {
 	account, err := s.RegisterAccount(data.phone)
 	if err != nil {
 		return nil, nil, fmt.Errorf("can't register account, error = %v", err)
@@ -64,6 +61,7 @@ func (s *testService) addAccount(data testAccount) (*types.Account, []*types.Pay
 	}
 	return account, payments, nil
 }
+
 type Error string
 
 func (e Error) Error() string {
@@ -90,7 +88,7 @@ func (s *Service) FindPaymentByID(paymentID string) (*types.Payment, error) {
 	for _, payment := range s.payments {
 		if payment.ID == paymentID {
 			return payment, nil
-		} 
+		}
 	}
 	return nil, ErrPaymentNotFound
 }
@@ -111,7 +109,7 @@ func (s *Service) RegisterAccount(phone types.Phone) (*types.Account, error) {
 			return nil, ErrPhoneRegistered
 		}
 	}
-	
+
 	s.nextAccountID++
 	account := &types.Account{
 		ID:      s.nextAccountID,
@@ -119,7 +117,7 @@ func (s *Service) RegisterAccount(phone types.Phone) (*types.Account, error) {
 		Balance: 0,
 	}
 	s.accounts = append(s.accounts, account)
-	
+
 	return account, nil
 }
 
@@ -144,11 +142,11 @@ func (s *Service) Deposit(accountID int64, amount types.Money) error {
 	return nil
 }
 
-func (s *Service) Pay(accountID int64, amount types.Money, category types.PaymentCategory) (*types.Payment, error){
-	if amount <= 0{
+func (s *Service) Pay(accountID int64, amount types.Money, category types.PaymentCategory) (*types.Payment, error) {
+	if amount <= 0 {
 		return nil, ErrAmountMustBePositive
 	}
-	
+
 	var account *types.Account
 	for _, acc := range s.accounts {
 		if acc.ID == accountID {
@@ -167,22 +165,24 @@ func (s *Service) Pay(accountID int64, amount types.Money, category types.Paymen
 	account.Balance -= amount
 	paymentID := uuid.New().String()
 	payment := &types.Payment{
-		ID: paymentID,
-		AccountID:	accountID,
-		Amount: amount,
-		Category: category,
-		Status:	types.PaymentStatusInProgress,
+		ID:        paymentID,
+		AccountID: accountID,
+		Amount:    amount,
+		Category:  category,
+		Status:    types.PaymentStatusInProgress,
 	}
 	s.payments = append(s.payments, payment)
 	return payment, nil
 }
 
-func (s *Service) Repeat(paymentID string) (*types.Payment, error){
-	for _, rep := range s.payments {
-		if rep.ID == paymentID {
-			paymentID = rep.ID
-			break
-		}
+func (s *Service) Repeat(paymentID string) (*types.Payment, error) {
+	payment, err := s.FindPaymentByID(paymentID)
+	if err != nil {
+		return nil, err
 	}
-	return nil, ErrPaymentNotFound
+	NewPayment := payment
+	NewPayment.ID = uuid.New().String()
+
+	s.payments = append(s.payments, NewPayment)
+	return payment, nil
 }
